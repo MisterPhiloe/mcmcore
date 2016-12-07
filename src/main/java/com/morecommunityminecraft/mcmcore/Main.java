@@ -1,5 +1,6 @@
 package com.morecommunityminecraft.mcmcore;
 
+import com.morecommunityminecraft.mcmcore.commands.Commands;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -10,7 +11,7 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         Logger log = getLogger();
         log.info(this.getName() + " has been enabled!");
-
+        registerCommands();
     }
 
     @Override
@@ -20,6 +21,6 @@ public final class Main extends JavaPlugin {
     }
 
     private void registerCommands(){
-
+        getCommand("help").setExecutor(new Commands());
     }
 }
