@@ -2,16 +2,24 @@ package com.morecommunityminecraft.mcmcore;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Logger;
+
 public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-        //Does this work
+        Logger log = getLogger();
+        log.info(this.getName() + " has been enabled!");
+
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        Logger log = getLogger();
+        log.info(this.getName() + " has been disabled!");
+    }
+
+    private void registerCommands(){
+
     }
 }
