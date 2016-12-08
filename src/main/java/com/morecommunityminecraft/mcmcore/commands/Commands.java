@@ -18,7 +18,7 @@ public class Commands implements CommandExecutor {
         Player player = (Player) sender;
 
         if(label.equalsIgnoreCase("help")) {
-            if (Main.getPermission().has(player, "mcmcommand.help")) {
+            if (Main.getInstance().getPermission().has(player, "mcmcommand.help")) {
                 switch (args.length) {
                     case 0:
                         break;

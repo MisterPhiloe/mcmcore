@@ -34,6 +34,7 @@
 # IntelliJ
 /out/
 mcmcore.iml
+src/main/resources/database.yml
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
