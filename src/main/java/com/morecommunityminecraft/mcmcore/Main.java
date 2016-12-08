@@ -2,10 +2,11 @@ package com.morecommunityminecraft.mcmcore;
 
 import com.morecommunityminecraft.mcmcore.database.DatabaseConnection;
 import com.morecommunityminecraft.mcmcore.commands.Commands;
+import com.sk89q.worldguard.bukkit.WGBukkit;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,6 +20,7 @@ public final class Main extends JavaPlugin {
 
     private static final Logger log = Logger.getLogger("Minecraft");
     private static Main main;
+    private WorldGuardPlugin worldGuardPlugin;
     private Economy econ = null;
     private Permission perms = null;
     private Chat chat = null;
@@ -27,6 +29,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         main = this;
+        worldGuardPlugin = WGBukkit.getPlugin();
         log.info(this.getName() + " has been enabled!");
 
         if (!setupEconomy() ) {
@@ -91,6 +94,10 @@ public final class Main extends JavaPlugin {
 
     public Chat getChat(){
         return chat;
+    }
+
+    public WorldGuardPlugin getWorldGuard() {
+        return this.worldGuardPlugin;
     }
 
     /* database.yml setup */
