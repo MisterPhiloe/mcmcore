@@ -1,5 +1,6 @@
 name: Mcmcore
 version: ${project.version}
 main: com.morecommunityminecraft.mcmcore.Main
+depend: [Vault]
 commands:
     help:

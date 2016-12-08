@@ -1,6 +1,7 @@
 package com.morecommunityminecraft.mcmcore.commands;
 
 
+import com.morecommunityminecraft.mcmcore.Main;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,7 @@ public class Commands implements CommandExecutor {
         Player player = (Player) sender;
 
         if(label.equalsIgnoreCase("help")) {
-            if (player.hasPermission("Some.Permission")) {
+            if (Main.getPermission().has(player, "mcmcommand.help")) {
                 switch (args.length) {
                     case 0:
                         break;
