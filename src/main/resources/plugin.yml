@@ -1,3 +1,5 @@
 name: Mcmcore
 version: ${project.version}
 main: com.morecommunityminecraft.mcmcore.Main
+commands:
+    help:
