@@ -1,13 +1,15 @@
 package com.morecommunityminecraft.mcmcore;
 
-import com.morecommunityminecraft.mcmcore.Database.DatabaseConnection;
+import com.morecommunityminecraft.mcmcore.database.DatabaseConnection;
 import com.morecommunityminecraft.mcmcore.commands.Commands;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.sql.Connection;
@@ -91,22 +93,28 @@ public final class Main extends JavaPlugin {
         return chat;
     }
 
-    /* Database.yml setup */
+    /* database.yml setup */
     private void setupDatabase(){
-        String[] stray = {"hostname", "port", "username", "password", "database"};
-        File file = new File(getDataFolder(), "database.yml");
-        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
-        for (String s : stray) {
-            if (yaml.getString(s) == null || yaml.getString(s).equalsIgnoreCase("")) {
-                yaml.set(s, s);
+        BukkitRunnable bukkitRunnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                String[] stray = {"hostname", "port", "username", "password", "database"};
+                File file = new File(getDataFolder(), "database.yml");
+                YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+                for (String s : stray) {
+                    if (yaml.getString(s) == null || yaml.getString(s).equalsIgnoreCase("")) {
+                        yaml.set(s, s);
+                    }
+                }
+                connection = new DatabaseConnection(
+                        yaml.getString(stray[0]),
+                        yaml.getString(stray[1]),
+                        yaml.getString(stray[2]),
+                        yaml.getString(stray[3]),
+                        yaml.getString(stray[4])).getConnection();
             }
-        }
-        connection = new DatabaseConnection(
-                yaml.getString(stray[0]),
-                yaml.getString(stray[1]),
-                yaml.getString(stray[2]),
-                yaml.getString(stray[3]),
-                yaml.getString(stray[4])).getConnection();
+        };
+        bukkitRunnable.runTaskAsynchronously(this);
     }
 
     public Connection getConnection() {

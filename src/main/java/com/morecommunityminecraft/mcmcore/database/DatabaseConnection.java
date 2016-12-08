@@ -1,4 +1,4 @@
-package com.morecommunityminecraft.mcmcore.Database;
+package com.morecommunityminecraft.mcmcore.database;
 
 
 
