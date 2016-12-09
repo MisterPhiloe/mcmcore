@@ -1,45 +1,34 @@
 package com.morecommunityminecraft.mcmcore;
 
-import com.morecommunityminecraft.mcmcore.database.DatabaseConnection;
 import com.morecommunityminecraft.mcmcore.commands.Commands;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.logging.Logger;
 
 public final class Main extends JavaPlugin {
 
-    private static final Logger log = Logger.getLogger("Minecraft");
+    private final Logger log = Logger.getLogger("Minecraft");
     private static Main main;
     private WorldGuardPlugin worldGuardPlugin;
     private Economy econ = null;
     private Permission perms = null;
     private Chat chat = null;
-    private Connection connection;
 
     @Override
     public void onEnable() {
         main = this;
-        worldGuardPlugin = WGBukkit.getPlugin();
+        setupConfig();
+        setupWorldGuard();
         log.info(this.getName() + " has been enabled!");
-
-        if (!setupEconomy() ) {
-            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
-        setupPermissions();
-        setupChat();
-
         registerCommands();
 
     }
@@ -52,6 +41,28 @@ public final class Main extends JavaPlugin {
 
     public static Main getInstance(){
         return main;
+    }
+
+    private void setupWorldGuard() {
+        worldGuardPlugin = WGBukkit.getPlugin();
+        if (!setupEconomy() ) {
+            log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        setupPermissions();
+        setupChat();
+    }
+
+    private void setupConfig() {
+        String[] stray = {"hostname", "port", "username", "password", "database"};
+        File file = new File(getDataFolder(), "database.yml");
+        YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
+        for (String s : stray) {
+            if (yaml.getString(s) == null || yaml.getString(s).equalsIgnoreCase("")) {
+                yaml.set(s, s);
+            }
+        }
     }
 
     /* Vault setup */
@@ -100,34 +111,9 @@ public final class Main extends JavaPlugin {
         return this.worldGuardPlugin;
     }
 
-    /* database.yml setup */
-    private void setupDatabase(){
-        BukkitRunnable bukkitRunnable = new BukkitRunnable() {
-            @Override
-            public void run() {
-                String[] stray = {"hostname", "port", "username", "password", "database"};
-                File file = new File(getDataFolder(), "database.yml");
-                YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
-                for (String s : stray) {
-                    if (yaml.getString(s) == null || yaml.getString(s).equalsIgnoreCase("")) {
-                        yaml.set(s, s);
-                    }
-                }
-                connection = new DatabaseConnection(
-                        yaml.getString(stray[0]),
-                        yaml.getString(stray[1]),
-                        yaml.getString(stray[2]),
-                        yaml.getString(stray[3]),
-                        yaml.getString(stray[4])).getConnection();
-            }
-        };
-        bukkitRunnable.runTaskAsynchronously(this);
+    public Logger getMinecraftLogger(){
+        return this.log;
     }
 
-    public Connection getConnection() {
-        if(connection == null) {
-            setupDatabase();
-        }
-        return connection;
-    }
+
 }

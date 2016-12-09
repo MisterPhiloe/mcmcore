@@ -94,5 +94,10 @@
             <artifactId>worldguard</artifactId>
             <version>LATEST</version>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>LATEST</version>
+        </dependency>
     </dependencies>
 </project>
