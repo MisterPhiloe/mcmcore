@@ -1,12 +1,13 @@
-package com.morecommunityminecraft.mcmcore.database;
+package com.morecommunityminecraft.mcmcore.database.Queries;
 
+import com.morecommunityminecraft.mcmcore.database.DatabaseQuery;
 import org.bukkit.entity.Player;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PlayerQuery extends DatabaseQuery{
+public class PlayerQuery extends DatabaseQuery {
 
     public PlayerQuery(){
         super();
@@ -21,6 +22,8 @@ public class PlayerQuery extends DatabaseQuery{
         while(rs.next()){
             hours = rs.getFloat("timeplayed");
         }
+        rs.close();
+        prepStatement.close();
         return hours;
     }
 
@@ -30,6 +33,7 @@ public class PlayerQuery extends DatabaseQuery{
         prepStatement.setFloat(1, hours);
         prepStatement.setString(2, player.getUniqueId().toString());
         prepStatement.executeUpdate();
+        prepStatement.close();
     }
 
 }
