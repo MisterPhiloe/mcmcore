@@ -13,6 +13,15 @@ public class PlayerQuery extends DatabaseQuery {
         super();
     }
 
+    public void addPlayer(Player player) throws SQLException {
+        String query = "INSERT IGNORE INTO players (players.id, players.name) VALUES (?, ?) ";
+        PreparedStatement prepStatement = getConnection().prepareStatement(query);
+        prepStatement.setString(1, player.getUniqueId().toString());
+        prepStatement.setString(2, player.getName());
+        prepStatement.executeUpdate();
+        prepStatement.close();
+    }
+
     public float getTimePlayed(Player player) throws SQLException {
         String query = "SELECT timeplayed FROM players WHERE players.id = ?";
         PreparedStatement prepStatement = getConnection().prepareStatement(query);
