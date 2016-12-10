@@ -2,17 +2,20 @@ package com.morecommunityminecraft.mcmcore;
 
 import com.morecommunityminecraft.mcmcore.commands.Commands;
 import com.morecommunityminecraft.mcmcore.database.MySQL;
+import com.morecommunityminecraft.mcmcore.events.JoinEvent;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public final class Main extends JavaPlugin {
@@ -24,7 +27,7 @@ public final class Main extends JavaPlugin {
     private Permission perms = null;
     private Chat chat = null;
 
-    private String[] dbKeys;
+    private String[] dbKeys = new String[5];
     private MySQL sql = null;
 
     @Override
@@ -32,11 +35,12 @@ public final class Main extends JavaPlugin {
         main = this;
         setupConfig();
         setupMySQL();
-        setupWorldGuard();
         log.info(this.getName() + " has been enabled!");
         registerCommands();
-
+        registerEvents();
+        //setupWorldGuard();
     }
+
 
     @Override
     public void onDisable() {
@@ -44,7 +48,7 @@ public final class Main extends JavaPlugin {
         log.info(this.getName() + " has been disabled!");
     }
 
-    public static Main getInstance(){
+    public static Main getInstance() {
         return main;
     }
 
@@ -56,7 +60,7 @@ public final class Main extends JavaPlugin {
 
     private void setupWorldGuard() {
         worldGuardPlugin = WGBukkit.getPlugin();
-        if (!setupEconomy() ) {
+        if (!setupEconomy()) {
             log.severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
             getServer().getPluginManager().disablePlugin(this);
             return;
@@ -67,6 +71,7 @@ public final class Main extends JavaPlugin {
 
     private void setupConfig() {
         String[] stray = {"hostname", "port", "username", "password", "database"};
+        List<String> l = new ArrayList<>();
         File file = new File(getDataFolder(), "database.yml");
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
         for (int i = 0; i < stray.length; i++) {
@@ -77,14 +82,19 @@ public final class Main extends JavaPlugin {
                 dbKeys[i] = yaml.getString(s);
             }
         }
-
-        saveConfig();
+        try {
+            yaml.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    /* Vault setup */
-
-    private void registerCommands(){
+    private void registerCommands() {
         getCommand("help").setExecutor(new Commands());
+    }
+
+    private void registerEvents() {
+        getServer().getPluginManager().registerEvents(new JoinEvent(), this);
     }
 
     private boolean setupEconomy() {
@@ -111,15 +121,15 @@ public final class Main extends JavaPlugin {
         return perms != null;
     }
 
-    public Permission getPermission(){
+    public Permission getPermission() {
         return perms;
     }
 
-    public Economy getEconomy(){
+    public Economy getEconomy() {
         return econ;
     }
 
-    public Chat getChat(){
+    public Chat getChat() {
         return chat;
     }
 
@@ -127,11 +137,11 @@ public final class Main extends JavaPlugin {
         return this.worldGuardPlugin;
     }
 
-    public Logger getMinecraftLogger(){
+    public Logger getMinecraftLogger() {
         return this.log;
     }
 
-    public MySQL getMySQL(){
+    public MySQL getMySQL() {
         return this.sql;
     }
 

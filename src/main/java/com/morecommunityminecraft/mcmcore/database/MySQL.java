@@ -1,6 +1,7 @@
 package com.morecommunityminecraft.mcmcore.database;
 
 
+import com.morecommunityminecraft.mcmcore.Main;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -48,34 +49,63 @@ public class MySQL {
         PreparedStatement ps = null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cN.length; i++) {
-            sb.append(cN[i]).append(" " + cT[i]);
-            if(i+1 < cN.length)
-                sb.append(", ");
+            sb.append(cN[i]).append(" " + cT[i]).append(", ");
         }
-        String query = "CREATE TABLE IF NOT EXISTS" + tableName + "(" + sb.toString() + ") " + addition;
+        String query = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + sb.toString() + addition + ")";
+        Main.getInstance().getLogger().info(query);
         try {
-            if(getConnection() != null) {
+            if (getConnection() != null) {
                 ps = getConnection().prepareStatement(query);
-                ps.executeQuery();
+                ps.executeUpdate();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             try {
-                if(ps != null)
-                ps.close();
+                if (ps != null)
+                    ps.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void insertString(String tableName, String[] fields, String[] values, @Nullable String addition){
-        if(fields.length != values.length) return;
+    public void insertString(String tableName, String[] fields, String[] values, @Nullable String addition) {
+        if (fields.length != values.length) return;
+        if (addition == null) {
+            addition = "";
+        }
         PreparedStatement ps = null;
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        for (int i = 0; i < fields.length; i++) {
+            sb1.append(fields[i]);
+            if (i + 1 < fields.length)
+                sb1.append(", ");
+        }
 
-        String query = "INSERT IGNORE INTO" + tableName + "";
+        StringBuilder sb2 = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            sb2.append("'" + values[i] + "'");
+            if (i + 1 < values.length)
+                sb2.append(", ");
+        }
+        String query = "INSERT IGNORE INTO " + tableName + " ( " + sb1.toString() + ") VALUES ( " + sb2.toString() + " ) " + addition;
+        Main.getInstance().getLogger().info(query);
+        try {
+            if (getConnection() != null) {
+                ps = getConnection().prepareStatement(query);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
 

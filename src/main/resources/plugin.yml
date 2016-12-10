@@ -1,6 +1,7 @@
 name: Mcmcore
 version: ${project.version}
 main: com.morecommunityminecraft.mcmcore.Main
-depend: [Vault], [WorldGuard]
+depend: [Vault, WorldGuard]
 commands:
     help:
+    mcmadmin:
