@@ -4,26 +4,12 @@ package com.morecommunityminecraft.mcmcore.database;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class MySQL {
-
-    public enum ColumnType {
-
-        VARCHAR(36), INT(11);
-
-        int value;
-
-        ColumnType(int value) {
-            this.value = value;
-        }
-
-        public String getType() {
-            return name() + "(" + value + ")";
-        }
-    }
 
     private HikariDataSource ds = null;
 
@@ -57,14 +43,16 @@ public class MySQL {
     }
 
 
-    public void createTable(String tableName, String[] cN, ColumnType[] cT) {
+    public void createTable(String tableName, String[] cN, String[] cT, @Nullable String addition) {
         if (cN.length != cT.length) return;
         PreparedStatement ps = null;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cN.length; i++) {
-            sb.append(cN[i]).append(cT[i]).append(",");
+            sb.append(cN[i]).append(" " + cT[i]);
+            if(i+1 < cN.length)
+                sb.append(", ");
         }
-        String query = "CREATE TABLE IF NOT EXISTS" + tableName + "(" + sb.toString() + ")";
+        String query = "CREATE TABLE IF NOT EXISTS" + tableName + "(" + sb.toString() + ") " + addition;
         try {
             if(getConnection() != null) {
                 ps = getConnection().prepareStatement(query);
@@ -80,6 +68,14 @@ public class MySQL {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void insertString(String tableName, String[] fields, String[] values, @Nullable String addition){
+        if(fields.length != values.length) return;
+        PreparedStatement ps = null;
+        StringBuilder sb = new StringBuilder();
+
+        String query = "INSERT IGNORE INTO" + tableName + "";
     }
 }
 

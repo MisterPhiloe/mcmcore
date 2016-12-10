@@ -1,6 +1,7 @@
 package com.morecommunityminecraft.mcmcore;
 
 import com.morecommunityminecraft.mcmcore.commands.Commands;
+import com.morecommunityminecraft.mcmcore.database.MySQL;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.chat.Chat;
@@ -23,10 +24,14 @@ public final class Main extends JavaPlugin {
     private Permission perms = null;
     private Chat chat = null;
 
+    private String[] dbKeys;
+    private MySQL sql = null;
+
     @Override
     public void onEnable() {
         main = this;
         setupConfig();
+        setupMySQL();
         setupWorldGuard();
         log.info(this.getName() + " has been enabled!");
         registerCommands();
@@ -41,6 +46,12 @@ public final class Main extends JavaPlugin {
 
     public static Main getInstance(){
         return main;
+    }
+
+
+    private void setupMySQL() {
+        this.sql = new MySQL(dbKeys[0], dbKeys[1], dbKeys[2], dbKeys[3], dbKeys[4]);
+        getMySQL().createTable("Players", new String[]{"uuid", "name", "playTime", "dateJoined"}, new String[]{"VARCHAR(36)", "VARCHAR(36)", "FLOAT(8,4)", "DATETIME"}, "PRIMARY KEY (uuid)");
     }
 
     private void setupWorldGuard() {
@@ -58,11 +69,16 @@ public final class Main extends JavaPlugin {
         String[] stray = {"hostname", "port", "username", "password", "database"};
         File file = new File(getDataFolder(), "database.yml");
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
-        for (String s : stray) {
+        for (int i = 0; i < stray.length; i++) {
+            String s = stray[i];
             if (yaml.getString(s) == null || yaml.getString(s).equalsIgnoreCase("")) {
                 yaml.set(s, s);
+            } else {
+                dbKeys[i] = yaml.getString(s);
             }
         }
+
+        saveConfig();
     }
 
     /* Vault setup */
@@ -113,6 +129,10 @@ public final class Main extends JavaPlugin {
 
     public Logger getMinecraftLogger(){
         return this.log;
+    }
+
+    public MySQL getMySQL(){
+        return this.sql;
     }
 
 

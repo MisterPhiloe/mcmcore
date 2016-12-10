@@ -1,8 +1,6 @@
 package com.morecommunityminecraft.mcmcore.events;
 
 
-import com.morecommunityminecraft.mcmcore.database.Queries.PlayerQuery;
-import com.morecommunityminecraft.mcmcore.database.Queries.ServerQuery;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,7 +12,6 @@ public class JoinEvent implements Listener{
     public void onPlayerJoin(PlayerJoinEvent e){
         e.setJoinMessage("");
         Player player = e.getPlayer();
-            new PlayerQuery().addPlayer(player);
-            player.sendMessage(new ServerQuery().getMessage(ServerQuery.MessageType.PLAYERMESSAGE));
+
     }
 }
