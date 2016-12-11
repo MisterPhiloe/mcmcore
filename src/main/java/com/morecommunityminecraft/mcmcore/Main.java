@@ -3,12 +3,14 @@ package com.morecommunityminecraft.mcmcore;
 import com.morecommunityminecraft.mcmcore.commands.Commands;
 import com.morecommunityminecraft.mcmcore.database.MySQL;
 import com.morecommunityminecraft.mcmcore.events.JoinEvent;
+import com.morecommunityminecraft.mcmcore.events.QuitEvent;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -55,7 +57,10 @@ public final class Main extends JavaPlugin {
 
     private void setupMySQL() {
         this.sql = new MySQL(dbKeys[0], dbKeys[1], dbKeys[2], dbKeys[3], dbKeys[4]);
-        getMySQL().createTable("Players", new String[]{"uuid", "name", "playTime", "dateJoined"}, new String[]{"VARCHAR(36)", "VARCHAR(36)", "FLOAT(8,4)", "DATETIME"}, "PRIMARY KEY (uuid)");
+        getMySQL().createTable("Players", new String[]{"uuid", "name", "playTime", "dateJoined"},
+                new String[]{"VARCHAR(36)", "VARCHAR(36)", "FLOAT(8,4)", "DATETIME"}, "PRIMARY KEY (uuid)");
+        getMySQL().createTable("Timer", new String[]{"uuid", "joined", "left"},
+                new String[]{"VARCHAR(36)", "DATETIME", "DATETIME"}, "PRIMARY KEY (uuid)");
     }
 
     private void setupWorldGuard() {
@@ -94,7 +99,9 @@ public final class Main extends JavaPlugin {
     }
 
     private void registerEvents() {
-        getServer().getPluginManager().registerEvents(new JoinEvent(), this);
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new JoinEvent(), this);
+        pm.registerEvents(new QuitEvent(), this);
     }
 
     private boolean setupEconomy() {

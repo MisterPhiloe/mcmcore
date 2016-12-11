@@ -8,7 +8,10 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MySQL {
 
@@ -52,7 +55,7 @@ public class MySQL {
             sb.append(cN[i]).append(" " + cT[i]).append(", ");
         }
         String query = "CREATE TABLE IF NOT EXISTS " + tableName + "(" + sb.toString() + addition + ")";
-        Main.getInstance().getLogger().info(query);
+        //Main.getInstance().getLogger().info(query);
         try {
             if (getConnection() != null) {
                 ps = getConnection().prepareStatement(query);
@@ -70,7 +73,7 @@ public class MySQL {
         }
     }
 
-    public void insertString(String tableName, String[] fields, String[] values, @Nullable String addition) {
+    public void insertObject(String tableName, String[] fields, String[] values, @Nullable String addition) {
         if (fields.length != values.length) return;
         if (addition == null) {
             addition = "";
@@ -90,7 +93,114 @@ public class MySQL {
                 sb2.append(", ");
         }
         String query = "INSERT IGNORE INTO " + tableName + " ( " + sb1.toString() + ") VALUES ( " + sb2.toString() + " ) " + addition;
-        Main.getInstance().getLogger().info(query);
+        //Main.getInstance().getLogger().info(query);
+        try {
+            if (getConnection() != null) {
+                ps = getConnection().prepareStatement(query);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void updateObject(String tableName, String[] fields, String[] values, String[] where){
+        if (fields.length != values.length) return;
+        PreparedStatement ps = null;
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < fields.length; i++){
+            sb.append(fields[i]).append(" = ").append(values[i]);
+            if (i + 1 < fields.length)
+                sb.append(", ");
+        }
+        String query = "UPDATE " + tableName + " SET " + sb.toString() + " WHERE " + where[0] + "=" + where[1];
+        try {
+            if (getConnection() != null) {
+                ps = getConnection().prepareStatement(query);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null)
+                    ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public String[] getObject(String tableName, String[] fields, @Nullable String[] where){
+        String addition;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        if (where == null) {
+            addition = "";
+        }
+
+        StringBuilder wheresb = new StringBuilder();
+        for(int i = 0; i < (where.length/2); i += 2){
+            wheresb.append("WHERE " + where[i]).append("="+where[i+1]);
+            if(i >=2){
+                wheresb.append(", ");
+            }
+        }
+
+        StringBuilder columns = new StringBuilder();
+        for(int i = 0; i < fields.length; i++){
+            columns.append(fields[i]);
+            if (i + 1 < fields.length)
+                columns.append(", ");
+        }
+        String query = "SELECT " + columns.toString() + " FROM " + tableName + " " + wheresb.toString();
+        String[] stray = new String[fields.length];
+        int count = 0;
+        try {
+            if (getConnection() != null) {
+                ps = getConnection().prepareStatement(query);
+                rs = ps.executeQuery();
+                while(rs.next()){
+                    stray[count] = rs.getString(fields[count]);
+                    count++;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (ps != null) {
+                    ps.close();
+                }
+                if(rs != null) {
+                    rs.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        System.out.println(Arrays.toString(stray));
+        return stray;
+    }
+
+    public void removeObject(String tableName, String[] fields, String[] values){
+        if (fields.length != values.length) return;
+        PreparedStatement ps = null;
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < fields.length; i++){
+            sb.append(fields[i]).append("=").append(values[i]);
+            if (i + 1 < fields.length)
+                sb.append(", ");
+        }
+
+        String query = "DELETE FROM " + tableName + " WHERE " + sb.toString();
         try {
             if (getConnection() != null) {
                 ps = getConnection().prepareStatement(query);
