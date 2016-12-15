@@ -8,8 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class JoinEvent implements Listener {
 

@@ -1,7 +1,5 @@
 package com.morecommunityminecraft.mcmcore.database;
 
-
-import com.morecommunityminecraft.mcmcore.Main;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -10,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class MySQL {
@@ -147,10 +144,12 @@ public class MySQL {
         }
 
         StringBuilder wheresb = new StringBuilder();
-        for(int i = 0; i < (where.length/2); i += 2){
-            wheresb.append("WHERE " + where[i]).append("="+where[i+1]);
-            if(i >=2){
-                wheresb.append(", ");
+        if (where != null) {
+            for (int i = 0; i < (where.length / 2); i += 2) {
+                wheresb.append("WHERE " + where[i]).append("=" + where[i + 1]);
+                if (i >= 2) {
+                    wheresb.append(", ");
+                }
             }
         }
 
