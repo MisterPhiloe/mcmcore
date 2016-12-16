@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="mcmcore">
-    <output-path>$USER_HOME$/Documents/mcm-API</output-path>
-    <root id="archive" name="mcmcore.jar">
-      <element id="module-output" name="mcmcore" />
-    </root>
-  </artifact>
-</component>
